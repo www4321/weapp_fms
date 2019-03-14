@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bupt.service.dao.bill.BillMapper">
+  <resultMap id="BaseResultMap" type="com.bupt.service.bean.bill.Bill">
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="consume_type" jdbcType="VARCHAR" property="consumeType" />
+    <result column="money" jdbcType="DECIMAL" property="money" />
+    <result column="consume_info" jdbcType="VARCHAR" property="consumeInfo" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="year" jdbcType="INTEGER" property="year" />
+    <result column="month" jdbcType="INTEGER" property="month" />
+    <result column="status" jdbcType="TINYINT" property="status" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, consume_type, money, consume_info, gmt_create, gmt_modified, year, month, 
+    status
+  </sql>
+
+  <select id="getTypeBills"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_bill
+    where user_id=#{userId, jdbcType=VARCHAR} and  consume_type= #{type, jdbcType=VARCHAR} and
+      gmt_create >= #{start_time,jdbcType=TIMESTAMP} AND gmt_create <![CDATA[<]]> #{end_time,jdbcType=TIMESTAMP}
+    order by gmt_create desc
+  </select>
+
+  <select id="statisticsBills"  resultType="com.bupt.service.service.bill.bean.BillStatistics">
+    SELECT consume_type as type, status, count(*) as num, sum(money) as sum
+    FROM tb_bill
+    WHERE user_id = #{userId, jdbcType=VARCHAR} AND gmt_create >= #{start_time,jdbcType=TIMESTAMP} AND gmt_create <![CDATA[<]]> #{end_time,jdbcType=TIMESTAMP}
+    GROUP BY consume_type, `status`
+  </select>
+
+  <select id="getBills"  resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from tb_bill
+    where user_id=#{userId, jdbcType=VARCHAR} and  year = #{year} and month = #{month} order by gmt_create desc
+  </select>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_bill
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from tb_bill
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.bupt.service.bean.bill.Bill">
+    insert into tb_bill (id, user_id, consume_type, 
+      money, consume_info, gmt_create, 
+      gmt_modified, year, month, 
+      status)
+    values (#{id,jdbcType=BIGINT}, #{userId,jdbcType=VARCHAR}, #{consumeType,jdbcType=VARCHAR}, 
+      #{money,jdbcType=DECIMAL}, #{consumeInfo,jdbcType=VARCHAR}, #{gmtCreate,jdbcType=TIMESTAMP}, 
+      #{gmtModified,jdbcType=TIMESTAMP}, #{year,jdbcType=INTEGER}, #{month,jdbcType=INTEGER}, 
+      #{status,jdbcType=TINYINT})
+  </insert>
+  <insert id="insertSelective" parameterType="com.bupt.service.bean.bill.Bill" useGeneratedKeys="true" keyProperty="id">
+    insert into tb_bill
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="consumeType != null">
+        consume_type,
+      </if>
+      <if test="money != null">
+        money,
+      </if>
+      <if test="consumeInfo != null">
+        consume_info,
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create,
+      </if>
+      <if test="gmtModified != null">
+        gmt_modified,
+      </if>
+      <if test="year != null">
+        year,
+      </if>
+      <if test="month != null">
+        month,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="consumeType != null">
+        #{consumeType,jdbcType=VARCHAR},
+      </if>
+      <if test="money != null">
+        #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="consumeInfo != null">
+        #{consumeInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="gmtCreate != null">
+        #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtModified != null">
+        #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="year != null">
+        #{year,jdbcType=INTEGER},
+      </if>
+      <if test="month != null">
+        #{month,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.bupt.service.bean.bill.Bill">
+    update tb_bill
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="consumeType != null">
+        consume_type = #{consumeType,jdbcType=VARCHAR},
+      </if>
+      <if test="money != null">
+        money = #{money,jdbcType=DECIMAL},
+      </if>
+      <if test="consumeInfo != null">
+        consume_info = #{consumeInfo,jdbcType=VARCHAR},
+      </if>
+      <if test="gmtCreate != null">
+        gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gmtModified != null">
+        gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      </if>
+      <if test="year != null">
+        year = #{year,jdbcType=INTEGER},
+      </if>
+      <if test="month != null">
+        month = #{month,jdbcType=INTEGER},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=TINYINT},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.bupt.service.bean.bill.Bill">
+    update tb_bill
+    set user_id = #{userId,jdbcType=VARCHAR},
+      consume_type = #{consumeType,jdbcType=VARCHAR},
+      money = #{money,jdbcType=DECIMAL},
+      consume_info = #{consumeInfo,jdbcType=VARCHAR},
+      gmt_create = #{gmtCreate,jdbcType=TIMESTAMP},
+      gmt_modified = #{gmtModified,jdbcType=TIMESTAMP},
+      year = #{year,jdbcType=INTEGER},
+      month = #{month,jdbcType=INTEGER},
+      status = #{status,jdbcType=TINYINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>
